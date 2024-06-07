@@ -1,0 +1,64 @@
+{
+  "name": "autoscaling",
+  "description": "Indexes wikipedia data, then executes searches with different target throughput.",
+  "schedule": [
+    {
+      "name": "delete-index",
+      "operation": "delete-index"
+    },
+    {
+      "name": "create-index",
+      "operation": "create-index"
+    },
+    {
+      "name": "check-cluster-health",
+      "operation": "check-cluster-health"
+    },
+    {
+      "name": "initial-documents-indexing",
+      "operation": "initial-documents-indexing",
+      "warmup-time-period": {{ initial_indexing_bulk_warmup_time_period | default(40) | int }},
+      "clients": {{ initial_indexing_bulk_clients | default(5) | int }}
+    },
+    {
+      "name": "refresh-after-index",
+      "operation": "refresh-after-index"
+    },
+    {
+      "name": "force-merge",
+      "operation": "force-merge"
+    },
+    {
+      "name": "refresh-after-force-merge",
+      "operation": "refresh-after-force-merge"
+    },
+    {
+      "name": "wait-until-merges-finish-after-index",
+      "operation": "wait-until-merges-finish-after-index"
+    }
+    {%- set p_as_clients = (as_clients | default([8,16,32])) %}
+    {%- set p_as_warmup_time_periods = (as_warmup_time_periods | default([300,300,300])) %}
+    {%- set p_as_time_periods = (as_time_periods | default([300,300,300])) %}
+    {%- set p_as_target_throughputs = (as_target_throughputs | default([100,200,300])) %}
+    {%- for i in range(p_as_clients|length) %},
+      {%- if p_as_target_throughputs[i] < 0 %}
+      {
+        "name": "query-string-search-c{{p_as_clients[i]}}",
+        "operation": "query-string-search",
+        "clients": {{ p_as_clients[i] }},
+        "time-period": {{ p_as_time_periods[i] }},
+        "warmup-time-period": {{ p_as_warmup_time_periods[i] }}
+      }
+      {%- else %}
+      {
+        "name": "query-string-search-c{{p_as_clients[i]}}-t{{p_as_target_throughputs[i]}}",
+        "operation": "query-string-search",
+        "clients": {{ p_as_clients[i] }},
+        "time-period": {{ p_as_time_periods[i] }},
+        "warmup-time-period": {{ p_as_warmup_time_periods[i] }},
+        "target-throughput": {{ p_as_target_throughputs[i] }}
+      }
+      {%- endif %}
+    {%- endfor %}
+  ]
+}

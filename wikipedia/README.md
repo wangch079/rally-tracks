@@ -74,6 +74,12 @@ This track accepts the following parameters with Rally 0.8.0+ using `--track-par
   - `parallel_indexing_search_warmup_time_period` (default: `10`)
   - `parallel_indexing_target_throughput`: (default: `100`)
 
+- Parameters for challenge `autoscaling`:
+  - `as_clients` (default: [8,16,32]): An array with the number of indexing clients to be used in each step.
+  - `as_warmup_time_periods` (default: [300,300,300]): An array with warm-up time period, in seconds, of every step.
+  - `as_time_periods` (default: [300,300,300]): An array with time period, in seconds, of every step.
+  - `as_target_throughputs` (default: [100,200,300]): An array with target throughput of each step, expressed in requests/s. Target throughput is not configured if the values specified in this array are negative.  
+
 ### License
 
 We use the same license for the data as the original data: [CC-SA-3.0](http://creativecommons.org/licenses/by-sa/3.0/).
