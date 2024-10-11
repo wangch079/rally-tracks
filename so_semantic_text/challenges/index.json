@@ -1,0 +1,19 @@
+{
+  "name": "index",
+  "description": "Indexes the whole document corpus using Elasticsearch default settings.",
+  "default": true,
+  "schedule": [
+    {
+      "operation": "rollover"
+    },
+    {
+      "operation": "index",
+      "warmup-time-period": 120,
+      "clients": {{ bulk_indexing_clients | default(8) }},
+      "ignore-response-error-level": "{{error_level | default('non-fatal')}}"
+    },
+    {
+      "operation": "delete-old-indices"
+    }
+  ]
+}

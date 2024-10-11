@@ -1,0 +1,67 @@
+{
+  "name": "rollover",
+  "operation-type": "raw-request",
+  "method": "POST",
+  "path": "/so-semantic-text/_rollover",
+  "body": {
+    "mappings": {
+      "dynamic": "strict",
+      "properties": {
+        "user": {
+          "type": "keyword"
+        },
+        "creationDate": {
+          "type": "date"
+        },
+        "title": {
+          "copy_to": ["title_semantic"],
+          "type": "text"
+        },
+        "questionId": {
+          "type": "keyword"
+        },
+        "answerId": {
+          "type": "keyword"
+        },
+        "acceptedAnswerId": {
+          "type": "keyword"
+        },
+        "tags": {
+          "type": "keyword"
+        },
+        "body": {
+          "type": "text"
+        },
+        "type": {
+          "type": "keyword"
+        },
+        "title_semantic": {
+          "type": "semantic_text",
+          "inference_id": "so-semantic-text-elser-model"
+        }
+      }
+    }
+  }
+},
+{
+  "name": "delete-old-indices",
+  "operation-type": "delete-old-indices"
+},
+{
+  "name": "index",
+  "operation-type": "bulk",
+  "bulk-size": {{ bulk_size | default(10) }},
+  "ingest-percentage": {{ ingest_percentage | default(100) }}
+},
+{
+  "name": "random-update",
+  "operation-type": "random-update",
+  "bulk-size": {{ random_update_bulk_size | default(100) }},
+  "update-percentage": {{ random_update_percentage | default(5) }}
+},
+{
+  "name": "semantic-search",
+  "operation-type": "search",
+  "param-source": "semantic-search-param-source",
+  "size": {{ semantic_search_page_size | default(20) | int }}
+}

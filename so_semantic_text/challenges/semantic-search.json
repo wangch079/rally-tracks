@@ -1,0 +1,14 @@
+{
+  "name": "semantic-search",
+  "description": "Benchmark with semantic text search",
+  "schedule": [
+    {
+      "name": "semantic-search",
+      "operation": "semantic-search",
+      "clients": {{ semantic_search_clients | default(1) | int }},
+      "time-period": {{ semantic_search_time_period | default(300) | int }},
+      "warmup-time-period": {{ semantic_search_warmup_time_period | default(10) | int }},
+      "target-throughput": {{ semantic_search_target_throughput | default(1) | int }}
+    }
+  ]
+}

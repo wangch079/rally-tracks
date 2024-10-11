@@ -1,0 +1,9 @@
+{
+  "name": "random-update",
+  "description": "Randomly select some documents and update them",
+  "schedule": [
+    {
+      "operation": "random-update"
+    }
+  ]
+}
