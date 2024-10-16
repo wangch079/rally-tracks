@@ -2,10 +2,10 @@ import asyncio
 import bz2
 import copy
 import logging
-from os.path import dirname
 import random
+from datetime import datetime, timedelta, timezone
+from os.path import dirname
 
-from datetime import datetime, timezone, timedelta
 from elasticsearch.helpers import async_scan
 from esrally.track.params import ParamSource
 
@@ -27,27 +27,16 @@ class SemanticSearchParamSource(ParamSource):
         with bz2.open(QUERIES_FILENAME, mode="r") as queries_file:
             for query in queries_file:
                 query = query.decode("utf-8")
-                escaped_query = query.replace("\"", "\\\"").strip()
+                escaped_query = query.replace('"', '\\"').strip()
                 queries.append(escaped_query)
 
         return queries
 
     def params(self):
         query = random.choice(self._queries)
-        es_query = {
-            "semantic": {
-                "field": "title_semantic",
-                "query": query
-            }
-        }
+        es_query = {"semantic": {"field": "title_semantic", "query": query}}
 
-        return {
-            "body": {
-                "query": es_query
-            },
-            "size": self._params["size"],
-            "index": INDEX
-        }
+        return {"body": {"query": es_query}, "size": self._params["size"], "index": INDEX}
 
 
 class DeleteOldIndicesRunner:
@@ -97,18 +86,7 @@ class RandomUpdateRunner:
         queries = self._read_queries()
         # randomly select some documents to update
         query = {
-            "query": {
-                "function_score": {
-                    "functions": [
-                        {
-                            "random_score": {
-                                "seed": int(datetime.now().timestamp()),
-                                "field": "questionId"
-                            }
-                        }
-                    ]
-                }
-            }
+            "query": {"function_score": {"functions": [{"random_score": {"seed": int(datetime.now().timestamp()), "field": "questionId"}}]}}
         }
         bulk_payload = []
         bulk_size = params["bulk-size"]
@@ -138,7 +116,7 @@ class RandomUpdateRunner:
         with bz2.open(QUERIES_FILENAME, mode="r") as queries_file:
             for query in queries_file:
                 query = query.decode("utf-8")
-                escaped_query = query.replace("\"", "\\\"").strip()
+                escaped_query = query.replace('"', '\\"').strip()
                 queries.append(escaped_query)
 
         return queries

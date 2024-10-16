@@ -19,9 +19,7 @@ def generate_queries(input_filename: str, output_filename: str, query_count: int
     output_open_func = get_open_func(output_filename)
 
     question_count = 0
-    with (input_open_func(input_filename, mode="r") as input_file,
-          output_open_func(output_filename, mode="w") as output_file):
-
+    with (input_open_func(input_filename, mode="r") as input_file, output_open_func(output_filename, mode="w") as output_file):
         for line in input_file:
             parsed_line = json.loads(line)
             if parsed_line["type"] == "question":
@@ -49,8 +47,14 @@ if __name__ == "__main__":
     )
     arg_parser.add_argument("input_file", help="Path to posts JSON file")
     arg_parser.add_argument("output_file", help="Path to output file")
-    arg_parser.add_argument("-c", "--count", dest="query_count", type=int, required=False,
-                            help="The number of queries to write to the output file. Defaults to all queries.")
+    arg_parser.add_argument(
+        "-c",
+        "--count",
+        dest="query_count",
+        type=int,
+        required=False,
+        help="The number of queries to write to the output file. Defaults to all queries."
+    )
 
     args = arg_parser.parse_args()
     generate_queries(args.input_file, args.output_file, args.query_count)
