@@ -1,3 +1,4 @@
+import asyncio
 import bz2
 import copy
 import logging
@@ -112,20 +113,24 @@ class RandomUpdateRunner:
         bulk_payload = []
         bulk_size = params["bulk-size"]
         count = 0
+        tasks = []
         async for doc in async_scan(client=es, index=write_index, query=query, _source=False):
             bulk_payload.append({"update": {"_index": write_index, "_id": doc["_id"]}})
             random_query = random.choice(queries)
             bulk_payload.append({"doc": {"title": random_query, "title_semantic": random_query}})
             count += 1
             if len(bulk_payload) / 2 >= bulk_size:
-                await es.bulk(operations=copy.copy(bulk_payload))
+                tasks.append(asyncio.create_task(es.bulk(operations=copy.copy(bulk_payload))))
                 bulk_payload.clear()
 
             if count >= update_target:
                 break
 
         if bulk_payload:
-            await es.bulk(operations=copy.copy(bulk_payload))
+            tasks.append(asyncio.create_task(es.bulk(operations=copy.copy(bulk_payload))))
+
+        if tasks:
+            await asyncio.gather(*tasks)
 
     @staticmethod
     def _read_queries():
