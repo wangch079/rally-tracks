@@ -14,11 +14,11 @@
       "base-url": "https://rally-tracks.elastic.co/so",
       "documents": [
         {
-          "source-file": "posts.json.bz2",
+          "source-file": "posts-with-title.json.bz2",
           "target-index": "so-semantic-text",
-          "document-count": 36062278,
-          "compressed-bytes": 9600716233,
-          "uncompressed-bytes": 35564808298
+          "document-count": 14015379,
+          "compressed-bytes": 5343696003,
+          "uncompressed-bytes": 19684952026
         }
       ]
     }
